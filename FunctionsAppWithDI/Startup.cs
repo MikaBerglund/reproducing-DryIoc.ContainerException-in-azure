@@ -20,18 +20,19 @@ namespace FunctionsAppWithDI
             builder.Services
                 .AddSingleton(sp =>
                 {
-                    var config = sp.GetRequiredService<IConfiguration>();
-                    return config.GetSection("myapp").Get<AppRootSection>();
+                    var options = new ApplicationOptions();
+                    sp.GetRequiredService<IConfiguration>()
+                        .GetSection("myapp:application")
+                        .Bind(options);
+                    return options;
                 })
                 .AddSingleton(sp =>
                 {
-                    var root = sp.GetRequiredService<AppRootSection>();
-                    return root.Application;
-                })
-                .AddSingleton(sp =>
-                {
-                    var root = sp.GetRequiredService<AppRootSection>();
-                    return root.Data;
+                    var options = new DatabaseOptions();
+                    sp.GetRequiredService<IConfiguration>()
+                        .GetSection("myapp:data")
+                        .Bind(options);
+                    return options;
                 })
                 .AddSingleton<DataService>()
                 .AddSingleton<GraphClient>();
